@@ -24,7 +24,7 @@ class MessagesController < ApplicationController
   # POST /messages
   # POST /messages.json
   def create
-    @message = Message.new(headers: request.headers.to_h, body: request.body.read)
+    @message = Message.new(headers: request.headers.to_h.to_json, body: request.body.read)
 
     respond_to do |format|
       if @message.save

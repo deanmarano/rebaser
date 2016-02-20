@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :pull_requests
   post 'github/webhooks' => "messages#create"
   resources :messages
   # The priority is based upon order of creation: first created -> highest priority.
