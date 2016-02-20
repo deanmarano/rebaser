@@ -3,3 +3,8 @@ source 'https://rubygems.org'
 
 gem 'sinatra'
 gem 'httparty'
+gem 'rspec'
+gem 'rack-test'
+gem 'vcr'
+gem 'webmock'
+gem 'pry'
