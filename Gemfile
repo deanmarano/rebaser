@@ -2,6 +2,10 @@ ruby "2.3.0"
 source 'https://rubygems.org'
 
 
+gem 'omniauth-github'
+gem 'omniauth'
+gem 'devise'
+gem "octokit"
 gem 'delayed_job_active_record'
 gem 'pg'
 gem 'httparty'

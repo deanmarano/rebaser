@@ -4,14 +4,15 @@ module Git
     class RemoteConnectionError < StandardError; ; end
     class ManualRebaseNeeded < StandardError; ; end
     attr_reader :git_url
+    attr_accessor :data
 
     def self.test_repo
-      load './lib/github.rb'
       self.new("git@github.com:deanmarano/my-test-repo.git")
     end
 
-    def initialize(git_url)
+    def initialize(git_url, data = {})
       @git_url = git_url
+      @data = data
       # Example: git://github.com/deanmarano/my-test-repo.git
       # git@github.com/deanmarano/my-test-repo.git
     end
@@ -32,8 +33,8 @@ module Git
     end
 
     def clone
-      FileUtils.mkdir_p "repos/#{self.owner}"
-      chdir "repos/#{self.owner}" do
+      FileUtils.mkdir_p "/tmp/repos/#{self.owner}"
+      chdir "/tmp/repos/#{self.owner}" do
         `git clone #{self.git_url}`
       end
     end

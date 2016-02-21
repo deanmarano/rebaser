@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :repositories
+  devise_for :people, :controllers => { :omniauth_callbacks => "callbacks" }
   resources :pull_requests
   post 'github/webhooks' => "messages#create"
   resources :messages
@@ -6,7 +8,7 @@ Rails.application.routes.draw do
   # See how all your routes lay out with "rake routes".
 
   # You can have the root of your site routed with "root"
-  # root 'welcome#index'
+  root 'repositories#index'
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
