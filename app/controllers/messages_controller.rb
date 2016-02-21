@@ -41,10 +41,8 @@ class MessagesController < ApplicationController
     respond_to do |format|
       if @message.save
         ReadMessageJob.perform_later @message.id
-        format.html { redirect_to @message, notice: 'Message was successfully created.' }
-        format.json { render :show, status: :created, location: @message }
+        format.json { render :show, status: :created }
       else
-        format.html { render :new }
         format.json { render json: @message.errors, status: :unprocessable_entity }
       end
     end
