@@ -1,24 +1,24 @@
 module Github
   class PullRequest
-    attr_reader :number
+    attr_reader :number, :body
     def self.from_message(message)
       self.new(message.body)
     end
 
     def initialize(body = {})
-      self.body = body
+      @body = body
     end
 
     def number
       self.pull_request.fetch('number')
     end
 
-    def repo
-      self.body.fetch('repo')
+    def repository
+      @body.fetch('repository')
     end
 
     def ssh_url
-      self.repo.fetch('ssh_url')
+      self.repository.fetch('ssh_url')
     end
 
     def self.create(branch)
@@ -39,10 +39,23 @@ module Github
                     }))
     end
 
+    def issues_url
+      pull_request.fetch('_links').fetch('issue')
+      @body.fetch('pull_request').fetch('_links').fetch('issue').fetch('href')
+    end
+
+    def has_approved_tag?
+      HTTParty.get(issues_url, headers: {
+        "Authorization" => "token #{token}",
+        "User-Agent" => "Rebaser",
+        "Content-Type" => 'application/json'
+      })
+    end
+
     private
 
     def pull_request
-      self.body.fetch('pull_request')
+      @body.fetch('pull_request')
     end
 
     attr_accessor :body, :pull_request, :number
