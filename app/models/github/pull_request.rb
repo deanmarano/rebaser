@@ -1,6 +1,6 @@
 module Github
   class PullRequest
-    attr_reader :number, :body
+    attr_accessor :body, :pull_request, :number
     def self.from_message(message)
       self.new(message.body)
     end
@@ -21,10 +21,13 @@ module Github
       self.repository.fetch('ssh_url')
     end
 
+    def token
+      ENV['GITHUB_ACCESS_KEY']
+    end
+
     def self.create(branch)
       owner = 'deanmarano'
       repo = 'my-test-repo'
-      token = ENV['GITHUB_ACCESS_KEY']
       HTTParty.post("https://api.github.com/repos/#{owner}/#{repo}/pulls",
                     headers: {
                       "Authorization" => "token #{token}",
@@ -40,11 +43,14 @@ module Github
     end
 
     def issues_url
-      pull_request.fetch('_links').fetch('issue')
-      @body.fetch('pull_request').fetch('_links').fetch('issue').fetch('href')
+      self.pull_request.fetch('_links').fetch('issue').fetch('href')
     end
 
-    def has_approved_tag?
+    def labels
+      issue.fetch('labels')
+    end
+
+    def issue
       HTTParty.get(issues_url, headers: {
         "Authorization" => "token #{token}",
         "User-Agent" => "Rebaser",
@@ -52,12 +58,13 @@ module Github
       })
     end
 
-    private
+    def has_approved_tag?
+      labels.find {|tag| tag["name"] }.present?
+    end
 
     def pull_request
       @body.fetch('pull_request')
     end
 
-    attr_accessor :body, :pull_request, :number
   end
 end
