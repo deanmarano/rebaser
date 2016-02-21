@@ -7,15 +7,11 @@ class ReadMessageJob < ActiveJob::Base
     message = Message.find(message_id)
     if message.is_pr?
       pr = Github::PullRequest.from_message(message)
-      repo = Github::Repo.new(
-      repo = Git::Repo.new(pr.ssh_url)
-
-      if pr.needs_rebase?(pr, repo)
-        #GET /repos/:owner/:repo/commits
-        repo.create_tree(base, pr)
-        repo.tags
-        update_ref sha
+      repo = Github::Repo.new(full_name)
+      if needs_rebase?(pr, repo)
+        repo.rebase_branch(pr. repo.current_sha)
       end
+    end
   end
 
     def needs_rebase?(pr, repo)

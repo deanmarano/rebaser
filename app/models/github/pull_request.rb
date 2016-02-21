@@ -70,10 +70,6 @@ module Github
       labels.find {|tag| tag["name"] }.present?
     end
 
-    def needs_rebase?
-      has_approved_tag?
-    end
-
     def pull_request
       @body.fetch('pull_request')
     end

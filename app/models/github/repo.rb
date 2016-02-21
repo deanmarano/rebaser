@@ -15,11 +15,13 @@ module Github
       commits = self.client.repo(self.full_name).rels[:commits].get
       commits.data.first.sha
     end
-    def update_branch(branch_name, sha)
+
+    def rebase_branch(branch_name, sha)
       repo = self.github_client.repo self.full_name
-      branch_ref = repo.rels[:git_refs].get(ref: "heads/#{branch}")
+      repo.
+      new_sha = branch_ref = repo.rels[:git_refs].get(ref: "heads/#{branch}")
       branch_ref.rels[:self].patch({
-        sha: sha,
+        sha: new_sha,
         force: true
       })
     end

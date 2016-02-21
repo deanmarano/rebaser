@@ -54,15 +54,6 @@ module Git
       end
     end
 
-    def new_pr
-      name = Time.now.to_i
-      branch_name = create_branch(name)
-      create_commit(name)
-      push
-      create_pr(branch_name)
-      update_master
-    end
-
     def rebase(remote, branch)
       in_repo do
         `git pull --rebase #{remote} #{branch}`
