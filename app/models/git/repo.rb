@@ -32,7 +32,7 @@ module Git
     end
 
     def clone
-      `mkdir -p repos/#{self.owner}`
+      FileUtils.mkdir_p "repos/#{self.owner}"
       chdir "repos/#{self.owner}" do
         `git clone #{self.git_url}`
       end

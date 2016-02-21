@@ -21,7 +21,7 @@ module Github
       self.repository.fetch('ssh_url')
     end
 
-    def token
+    def self.token
       ENV['GITHUB_ACCESS_KEY']
     end
 
@@ -30,7 +30,7 @@ module Github
       repo = 'my-test-repo'
       HTTParty.post("https://api.github.com/repos/#{owner}/#{repo}/pulls",
                     headers: {
-                      "Authorization" => "token #{token}",
+                      "Authorization" => "token #{self.token}",
                       "User-Agent" => "Rebaser",
                       "Content-Type" => 'application/json'
                     },
@@ -52,7 +52,7 @@ module Github
 
     def issue
       HTTParty.get(issues_url, headers: {
-        "Authorization" => "token #{token}",
+        "Authorization" => "token #{self.class.token}",
         "User-Agent" => "Rebaser",
         "Content-Type" => 'application/json'
       })
