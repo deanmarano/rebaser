@@ -8,9 +8,10 @@ class ReadMessageJob < ActiveJob::Base
     pr = Github::PullRequest.from_message(message)
     repo = Git::Repo.new(pr.ssh_url)
 
-    return if !pr.has_approved_tag?
-    repo.pull
-    repo.rebase(branch: branch, remote: 'origin', remote_branch: 'master')
-    repo.merge(base: master, branch: branch)
+    if !pr.has_approved_tag?
+      repo.pull
+      repo.rebase(branch: branch, remote: 'origin', remote_branch: 'master')
+      repo.merge(base: master, branch: branch)
+    end
   end
 end

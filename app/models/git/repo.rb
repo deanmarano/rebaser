@@ -24,7 +24,7 @@ module Git
     end
 
     def path
-      "repos/#{owner}/#{name}"
+      "/tmp/repos/#{owner}/#{name}"
     end
 
     def git_config_path
