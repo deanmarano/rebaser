@@ -9,6 +9,32 @@ module Github
       self.pull_request.fetch('number')
     end
 
+    def repo
+      self.body.fetch('repo')
+    end
+
+    def ssh_url
+      self.repo.fetch('ssh_url')
+    end
+
+    def self.create(branch)
+      owner = 'deanmarano'
+      repo = 'my-test-repo'
+      token = ENV['GITHUB_API_TOKEN']
+      HTTParty.post("https://api.github.com/repos/#{owner}/#{repo}/pulls",
+                    headers: {
+                      "Authorization" => "token #{token}",
+                      "User-Agent" => "Rebaser",
+                      "Content-Type" => 'application/json'
+                    },
+                    body: JSON.generate({
+                      "title": "Amazing new feature",
+                      "body": "Please pull this in!",
+                      "head": branch,
+                      "base": "master"
+                    }))
+    end
+
     private
 
     def pull_request

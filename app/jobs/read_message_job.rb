@@ -4,9 +4,9 @@ class ReadMessageJob < ActiveJob::Base
   queue_as :default
 
   def perform(message_id)
-    message = Message.find(id)
-    repo = Git::Repo.new(message.body['repository']['full_name'])
-    pr = Github::PullRequest.new(id)
+    message = Message.find(message_id)
+    pr = Github::PullRequest.from_message(message)
+    repo = Git::Repo.new(pr.ssh_url)
 
     return if !pr.has_approved_tag?
     repo.pull

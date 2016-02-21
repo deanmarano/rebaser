@@ -54,11 +54,13 @@ module Git
     end
 
     def on_branch(branch, &block)
+      p "on branch #{branch}"
       in_repo do
         `git checkout #{branch}`
         if $?.exitstatus != 0
           raise CantFindBranch
         end
+        yield
       end
     end
 
@@ -72,12 +74,12 @@ module Git
     end
 
     def new_pr
+      pull
       name = Time.now.to_i
       branch_name = create_branch(name)
       create_commit(name)
       push(branch_name)
-      create_pr(branch_name)
-      pull
+      Github::PullRequest.create(branch_name)
     end
 
     def merge(base:, branch:)
@@ -103,6 +105,7 @@ module Git
     end
 
     def create_commit(name)
+      p 'create_commit'
       in_repo do
         File.open("file.txt", 'w') do |file|
           file.write name
@@ -113,6 +116,7 @@ module Git
     end
 
     def create_branch(name)
+      p 'create_branch'
       branch_name = "Github-create_branch-#{name}"
       in_repo do
         `git checkout -b #{branch_name}`
@@ -121,33 +125,23 @@ module Git
     end
 
     def push(branch, options = {})
+      p 'push'
       on_branch branch do
         if options[:force]
+          p 'git push --force'
           `git push --force`
         else
+          p 'git push'
           `git push`
         end
+
+        p $?.exitstatus
         if $?.exitstatus != 0
+          p 'exception'
           raise RemoteConnectionError
         end
       end
     end
 
-    def create_pr(branch)
-      owner = 'deanmarano'
-      repo = 'my-test-repo'
-      HTTParty.post("https://api.github.com/repos/#{owner}/#{repo}/pulls",
-                    headers: {
-                      "Authorization" => "token ff3864a7ca119627030e867dceda5638ca4eacb8",
-                      "User-Agent" => "Rebaser",
-                      "Content-Type" => 'application/json'
-                    },
-                    body: JSON.generate({
-                      "title": "Amazing new feature",
-                      "body": "Please pull this in!",
-                      "head": branch,
-                      "base": "master"
-                    }))
-    end
   end
 end
