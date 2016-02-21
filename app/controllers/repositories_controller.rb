@@ -1,18 +1,19 @@
 class RepositoriesController < ApplicationController
   before_action :authenticate_person!
-  before_action :set_repository, only: [:show, :edit, :update, :destroy]
+  before_action :set_repository, only: [:edit, :update, :destroy]
 
   # GET /repositories
   # GET /repositories.json
   def index
     @repositories = current_person.github_client.repos
-    render json: @repositories
   end
 
   # GET /repositories/1
   # GET /repositories/1.json
   def show
-    render json: @repository
+    @repository = Repository.find_by(full_name: URI.decode(params[:id])) ||
+      Repository.find_by(id: params[:id]) ||
+      Repository.new(person: current_person, full_name: params[:id])
   end
 
   # GET /repositories/new

@@ -17,6 +17,14 @@ module Github
       @body.fetch('repository')
     end
 
+    def base_sha
+      @body['pull_request']['base']['sha']
+    end
+
+    def head_sha
+      @body['pull_request']['head']['sha']
+    end
+
     def ssh_url
       self.repository.fetch('ssh_url')
     end
@@ -60,6 +68,10 @@ module Github
 
     def has_approved_tag?
       labels.find {|tag| tag["name"] }.present?
+    end
+
+    def needs_rebase?
+      has_approved_tag?
     end
 
     def pull_request
