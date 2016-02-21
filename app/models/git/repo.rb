@@ -1,12 +1,11 @@
-require 'date'
-require 'pry'
-require 'httparty'
-
 module Git
-  class Repository
+  class Repo
+    class CantFindBranch < StandardError; ; end
+    class RemoteConnectionError < StandardError; ; end
+    class ManualRebaseNeeded < StandardError; ; end
     attr_reader :git_url
 
-    def self.my_test_repo
+    def self.test_repo
       load './lib/github.rb'
       self.new("git@github.com:deanmarano/my-test-repo.git")
     end
@@ -54,18 +53,52 @@ module Git
       end
     end
 
+    def on_branch(branch, &block)
+      in_repo do
+        `git checkout #{branch}`
+        if $?.exitstatus != 0
+          raise CantFindBranch
+        end
+      end
+    end
+
+    def pull
+      on_branch 'master' do
+        `git pull`
+        if $?.exitstatus != 0
+          raise RemoteConnectionError
+        end
+      end
+    end
+
     def new_pr
       name = Time.now.to_i
       branch_name = create_branch(name)
       create_commit(name)
-      push
+      push(branch_name)
       create_pr(branch_name)
-      update_master
+      pull
     end
 
-    def rebase(remote, branch)
-      in_repo do
-        `git pull --rebase #{remote} #{branch}`
+    def merge(base:, branch:)
+      on_branch base do
+        `git merge #{branch}`
+        if $?.exitstatus != 0
+          `git merge --abort`
+          raise ManualMergeNeeded
+        end
+        push(branch)
+      end
+    end
+
+    def rebase(branch:, remote:, remote_branch:)
+      on_branch branch do
+        `git pull --rebase #{remote} #{remote_branch}`
+        if $?.exitstatus != 0
+          `git rebase --abort`
+          raise ManualRebaseNeeded
+        end
+        push(branch, force: true)
       end
     end
 
@@ -87,9 +120,16 @@ module Git
       branch_name
     end
 
-    def push
-      in_repo do
-        `git push`
+    def push(branch, options = {})
+      on_branch branch do
+        if options[:force]
+          `git push --force`
+        else
+          `git push`
+        end
+        if $?.exitstatus != 0
+          raise RemoteConnectionError
+        end
       end
     end
 
@@ -108,12 +148,6 @@ module Git
                       "head": branch,
                       "base": "master"
                     }))
-    end
-
-    def update_master
-      in_repo do
-        `git checkout master && git pull`
-      end
     end
   end
 end
