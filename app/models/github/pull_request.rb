@@ -2,7 +2,11 @@ module Github
   class PullRequest
     attr_reader :number
     def self.from_message(message)
-      self.body = message.body
+      self.new(message.body)
+    end
+
+    def initialize(body = {})
+      self.body = body
     end
 
     def number
@@ -20,7 +24,7 @@ module Github
     def self.create(branch)
       owner = 'deanmarano'
       repo = 'my-test-repo'
-      token = ENV['GITHUB_API_TOKEN']
+      token = ENV['GITHUB_ACCESS_KEY']
       HTTParty.post("https://api.github.com/repos/#{owner}/#{repo}/pulls",
                     headers: {
                       "Authorization" => "token #{token}",
