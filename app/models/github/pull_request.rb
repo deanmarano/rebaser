@@ -13,6 +13,10 @@ module Github
       self.pull_request.fetch('number')
     end
 
+    def full_name
+      self.body['repository']['full_name']
+    end
+
     def repository
       @body.fetch('repository')
     end
