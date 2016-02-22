@@ -7,7 +7,7 @@ class ReadMessageJob < ActiveJob::Base
     message = Message.find(message_id)
     if message.is_pr?
       pr = Github::PullRequest.from_message(message)
-      repo = Github::Repo.new(pr.full_name)
+      repo = Github::Repo.new(client, pr.full_name)
       if needs_rebase?(pr, repo)
         repo.rebase_branch(pr. repo.current_sha)
       end
