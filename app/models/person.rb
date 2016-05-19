@@ -17,7 +17,7 @@ class Person < ActiveRecord::Base
   end
 
   def github_client
-    @@client ||= Octokit::Client.new(access_token: token)
+    @client ||= Octokit::Client.new(access_token: token)
   end
 
   def token

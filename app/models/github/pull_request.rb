@@ -40,18 +40,13 @@ module Github
     def self.create(branch)
       owner = 'deanmarano'
       repo = 'my-test-repo'
-      HTTParty.post("https://api.github.com/repos/#{owner}/#{repo}/pulls",
-                    headers: {
-                      "Authorization" => "token #{self.token}",
-                      "User-Agent" => "Rebaser",
-                      "Content-Type" => 'application/json'
-                    },
-                    body: JSON.generate({
-                      "title": "Amazing new feature",
-                      "body": "Please pull this in!",
-                      "head": branch,
-                      "base": "master"
-                    }))
+      body = {
+        "title": "Amazing new feature",
+        "body": "Please pull this in!",
+        "head": branch,
+        "base": "master"
+      }
+      Person.first.github_client.post("/repos/#{owner}/#{repo}/pulls", body)
     end
 
     def issues_url
