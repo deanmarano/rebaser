@@ -26,7 +26,7 @@ module Github
         self.client.put(base_url + "/merge", { sha: pr_to_merge.head.sha })
         self.client.delete("/repos/#{self.full_name}/git/refs/heads/#{pr_to_merge.head.ref}")
       end
-      if pr_to_update = good_prs.shift || approved_pull_requests.shift
+      if pr_to_update = self.pull_requests.approved.checks_passed.shift
         self.client.post("/repos/#{self.full_name}/merges", {
           base: pr_to_update.head.ref,
           head: 'master'
