@@ -5,14 +5,6 @@ class ReadMessageJob < ActiveJob::Base
 
   def perform(message_id)
     Github::Repo.me.merge_up_to_date_pull_request
-    #message = Message.find(message_id)
-    #if message.is_pr?
-      #pr = Github::PullRequest.from_message(message)
-      #repo = Github::Repo.new(Person.last.github_client, pr.full_name)
-      #if needs_rebase?(pr, repo)
-        #repo.rebase_branch(pr, repo.current_sha)
-      #end
-    #end
   end
 
   def needs_rebase?(pr, repo)
