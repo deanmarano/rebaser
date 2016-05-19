@@ -27,10 +27,15 @@ module Github
         self.client.delete("/repos/#{self.full_name}/git/refs/heads/#{pr_to_merge.head.ref}")
       end
       if pr_to_update = self.pull_requests.approved.checks_passed.shift
-        self.client.post("/repos/#{self.full_name}/merges", {
+        merge = self.client.post("/repos/#{self.full_name}/merges", {
           base: pr_to_update.head.ref,
           head: 'master'
         })
+        if merge.message = "Merge conflict"
+          labels_url = pr_to_update.rels[:issue].get.data.rels[:self].href + "/labels"
+          self.client.post(labels_url, [ "Changes Needed" ])
+          self.client.delete(labels_url + "/Approved")
+        end
       end
     end
 

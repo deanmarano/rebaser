@@ -6,10 +6,9 @@ class Github::PullRequestRelation < Array
 
   def approved
     self.class.new(@repo, self.select do |pr|
-        pr.rels[:issue].get.data.rels[:labels].get.data.any? do |label|
-          label.name == 'Approved'
-        end
-      end)
+      labels = pr.rels[:issue].get.data.rels[:labels].get.data
+      labels.any? {|l| l.name == 'Approved'} && labels.none? {|l| l.name == 'Changes Needed'}
+    end)
   end
 
   def up_to_date(current_sha)
