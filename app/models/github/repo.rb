@@ -16,34 +16,11 @@ module Github
     end
 
     def pull_requests
-      self.repo.rels[:pulls].get.data
-    end
-
-    def approved_pull_requests
-      pull_requests.select do |pr|
-        pr.rels[:issue].get.data.rels[:labels].get.data.any? do |label|
-          label.name == 'Approved'
-        end
-      end
-    end
-
-    def up_to_date_approved_pull_requests
-      current_sha = self.current_sha
-      approved_pull_requests.select do |pr|
-        pr.base.sha == current_sha
-      end
-    end
-
-    def good_prs
-      approved_pull_requests.each do |pr|
-        self.client.get("/repos/#{self.full_name}/commits/#{pr.head.ref}/statuses").all? do |status|
-          status == 'success'
-        end
-      end
+      Github::PullRequestRelation.new(self, self.repo.rels[:pulls].get.data)
     end
 
     def merge_up_to_date_pull_request
-      pr_to_merge = good_prs.shift
+      pr_to_merge = self.pull_requests.approved.up_to_date(self.current_sha).checks_passed.shift
       if pr_to_merge.present?
         base_url = pr_to_merge._links.to_hash[:self].attrs[:href]
         self.client.put(base_url + "/merge", { sha: pr_to_merge.head.sha })
