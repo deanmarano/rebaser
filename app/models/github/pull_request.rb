@@ -13,8 +13,20 @@ module Github
       self.pull_request.fetch('number')
     end
 
+    def full_name
+      self.body['repository']['full_name']
+    end
+
     def repository
       @body.fetch('repository')
+    end
+
+    def base_sha
+      @body['pull_request']['base']['sha']
+    end
+
+    def head_sha
+      @body['pull_request']['head']['sha']
     end
 
     def ssh_url
@@ -28,18 +40,13 @@ module Github
     def self.create(branch)
       owner = 'deanmarano'
       repo = 'my-test-repo'
-      HTTParty.post("https://api.github.com/repos/#{owner}/#{repo}/pulls",
-                    headers: {
-                      "Authorization" => "token #{self.token}",
-                      "User-Agent" => "Rebaser",
-                      "Content-Type" => 'application/json'
-                    },
-                    body: JSON.generate({
-                      "title": "Amazing new feature",
-                      "body": "Please pull this in!",
-                      "head": branch,
-                      "base": "master"
-                    }))
+      body = {
+        "title": "Amazing new feature",
+        "body": "Please pull this in!",
+        "head": branch,
+        "base": "master"
+      }
+      Person.first.github_client.post("/repos/#{owner}/#{repo}/pulls", body)
     end
 
     def issues_url

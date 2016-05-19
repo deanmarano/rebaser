@@ -1,13 +1,32 @@
 <p id="notice"><%= notice %></p>
 
 <p>
+  <strong>URL:</strong>
+  <a href="<%= @repository.github_repo.rels[:html].href + '/settings/hooks' %>">Github</a>
+</p>
+
+<p>
   <strong>User:</strong>
-  <%= @repository.user_id %>
+  <%= @repository.person.email %>
 </p>
 
 <p>
   <strong>Name:</strong>
-  <%= @repository.name %>
+  <%= @repository.full_name %>
+</p>
+
+<p>
+  <strong>Hooks:</strong>
+  <% @repository.hooks.data.each do |hook| %>
+    <dl>
+      <dt>name</dt>
+      <dd> <%= hook.name %> </dd>
+      <dt>url</dt>
+      <dd> <%= hook.config.rels[:self].href %> </dd>
+      <dt>events</dt>
+      <dd> <%= hook.events %> </dd>
+    </dl>
+  <% end %>
 </p>
 
 <%= link_to 'Edit', edit_repository_path(@repository) %> |

@@ -1,6 +1,7 @@
 class Repository < ActiveRecord::Base
   serialize :data, Hash
   belongs_to :person
+  has_many :pull_requests, foreign_key: :repo_id
 
   def client
     @client ||= self.person.github_client

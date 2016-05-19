@@ -14,11 +14,11 @@
   <tbody>
     <% @repositories.each do |repository| %>
       <tr>
-        <td><%= repository.user_id %></td>
-        <td><%= repository.name %></td>
-        <td><%= link_to 'Show', repository %></td>
+        <td><%= repository.owner.login %></td>
+        <td><%= repository.full_name %></td>
+        <td><%= link_to 'Show', repository_path(id: repository.full_name) %></td>
         <td><%= link_to 'Edit', edit_repository_path(repository) %></td>
-        <td><%= link_to 'Destroy', repository, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td><%= link_to 'Destroy', repository_path(id: repository.full_name), method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>
