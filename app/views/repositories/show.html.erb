@@ -17,17 +17,23 @@
 
 <p>
   <strong>Hooks:</strong>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>URL</th>
+      </tr>
+    </thead>
+
+    <tbody>
   <% @repository.hooks.data.each do |hook| %>
-    <dl>
-      <dt>name</dt>
-      <dd> <%= hook.name %> </dd>
-      <dt>url</dt>
-      <dd> <%= hook.config.rels[:self].href %> </dd>
-      <dt>events</dt>
-      <dd> <%= hook.events %> </dd>
-    </dl>
-  <% end %>
-</p>
+      <tr>
+        <td><%= hook.name %></td>
+        <td><%= hook.config.rels[:self].try(:href) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
 
 <%= link_to 'Edit', edit_repository_path(@repository) %> |
 <%= link_to 'Back', repositories_path %>

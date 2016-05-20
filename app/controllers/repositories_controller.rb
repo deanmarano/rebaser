@@ -5,7 +5,8 @@ class RepositoriesController < ApplicationController
   # GET /repositories
   # GET /repositories.json
   def index
-    @repositories = current_person.github_client.repos
+    repositories = current_person.github_client.repos + current_person.github_client.orgs.map { |o| o.rels[:repos].get.data }.flatten
+    @repositories = repositories.group_by { |r| r.owner.login }
   end
 
   # GET /repositories/1
@@ -14,6 +15,7 @@ class RepositoriesController < ApplicationController
     @repository = Repository.find_by(full_name: URI.decode(params[:id])) ||
       Repository.find_by(id: params[:id]) ||
       Repository.new(person: current_person, full_name: params[:id])
+    @repository.save
   end
 
   # GET /repositories/new
